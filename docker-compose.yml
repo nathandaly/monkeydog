@@ -1,0 +1,86 @@
+###############################################################################
+#                          Generated on phpdocker.io                          #
+###############################################################################
+version: "3.1"
+services:
+    memcached:
+      image: memcached:alpine
+      container_name: monkeydog-be-memcached
+      volumes:
+        - memcached-data:/data
+      networks:
+        - monkeydog-network
+
+#    mailhog:
+#      image: mailhog/mailhog:latest
+#      container_name: monkeydog-be-mailhog
+#      ports:
+#        - "8081:8025"
+
+    redis:
+      build:
+        context: phpdocker/php-fpm
+      container_name: monkeydog-be-redis
+      ports:
+        - "6379:6379"
+      volumes:
+        - redis-data:/data
+      networks:
+        - monkeydog-network
+
+    mariadb:
+      image: mariadb:10.4
+      volumes:
+        - mysql-data:/data
+      environment:
+        - MYSQL_ROOT_PASSWORD=secret
+        - MYSQL_DATABASE=monkeydog
+        - MYSQL_USER=forge
+        - MYSQL_PASSWORD=forge
+      ports:
+        - 3306:3306
+      networks:
+        - monkeydog-network
+
+#    elasticsearch:
+#      image: elasticsearch:6.5.4
+#      container_name: monkeydog-be-elasticsearch
+
+    webserver:
+      image: nginx:alpine
+      restart: unless-stopped
+      container_name: monkeydog-be-webserver
+      working_dir: /application
+      volumes:
+          - .:/application
+          - ./phpdocker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      ports:
+        - ${MD_PORT}:80
+      networks:
+        - monkeydog-network
+
+    php-fpm:
+      build:
+        context: phpdocker/php-fpm
+        args:
+          - WITH_XDEBUG=true
+      env_file:
+        - phpdocker/php-fpm/.env
+      container_name: monkeydog-be-php-fpm
+      restart: unless-stopped
+      working_dir: /application
+      volumes:
+        - .:/application:consistent
+        - ./phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/7.4/fpm/conf.d/99-overrides.ini
+      networks:
+        - monkeydog-network
+
+networks:
+  monkeydog-network:
+    external: true
+
+# Volumes
+volumes:
+  mysql-data:
+  redis-data:
+  memcached-data:
