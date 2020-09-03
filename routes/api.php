@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//Route::post('/authenticate', 'Api\LoginController@authenticate')
-//    ->name('api.authenticate');
+Route::post('/login', 'Api\LoginController@login')
+    ->name('api.login');
 
 Route::middleware('auth:sanctum')->group(static function () {
     Route::get('/user', function (Request $request) {

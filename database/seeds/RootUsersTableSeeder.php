@@ -13,10 +13,13 @@ class RootUsersTableSeeder extends Seeder
      */
     public function run()
     {
+        $timeStamp = new DateTime();
         DB::table('users')->insert([
            'name' => 'Nathan Daly',
            'email' => 'justlikephp@gmail.com',
+           'email_verified_at' => $timeStamp,
            'password' => Hash::make('Monkeydog1!'),
+            'created_at' => $timeStamp,
         ]);
     }
 }
