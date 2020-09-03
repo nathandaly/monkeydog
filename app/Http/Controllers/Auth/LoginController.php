@@ -61,6 +61,7 @@ class LoginController extends Controller
         return response()->json([
             'success' => true,
             'login_at' => new \DateTime(),
+            'user' => $this->guard()->user(),
         ]);
     }
 
