@@ -14,11 +14,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/login', 'Api\LoginController@login')
-    ->name('api.login');
+/**
+ * Battle.NET authentication.
+ */
+Route::get('login/battlenet', 'Api\BattleNetLoginController@redirectToProvider');
+Route::get('login/battlenet/callback', 'Api\BattleNetLoginController@handleProviderCallback');
 
 Route::middleware('auth:sanctum')->group(static function () {
-    Route::get('/user', function (Request $request) {
+    Route::get('/user', static function (Request $request) {
         return $request->user();
     });
 });
