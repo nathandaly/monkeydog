@@ -1,17 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Date;
 use Laravel\Socialite\Facades\Socialite;
 
-class BattleNetLoginController extends ApiController
+class BattleNetLoginController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
@@ -33,6 +31,16 @@ class BattleNetLoginController extends ApiController
      */
     protected $redirectTo = RouteServiceProvider::HOME;
 
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('guest')->except('logout');
+    }
+
     public function redirectToProvider()
     {
         return Socialite::driver('battlenet')->stateless()->redirect();
@@ -44,7 +52,16 @@ class BattleNetLoginController extends ApiController
 
         // $user->token;
 
+        $request->session()->regenerate();
 
+        $this->clearLoginAttempts($request);
+
+        $this->guard()->login();
+        dd($this->guard()->user());
+
+        if ($response = $this->authenticated($request, $this->guard()->user())) {
+            return $response;
+        }
 
         return response()->json([
             'success' => true,
