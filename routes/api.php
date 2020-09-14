@@ -22,7 +22,16 @@ Route::get('login/battlenet', 'Api\BattleNetLoginController@redirectToProvider')
 Route::get('login/battlenet/callback', 'Api\BattleNetLoginController@handleProviderCallback');
 
 Route::middleware('auth:sanctum')->group(static function () {
+    Route::post('logout/battlenet', 'Api\BattleNetLoginController@logout');
+
+
     Route::get('/user', static function (Request $request) {
-        return $request->user();
+        if ($request->user()->tokenCan('profile:view')) {
+            return $request->user();
+        }
+
+        return response()->json([
+           'error' => 'Unable to view profile.',
+        ]);
     });
 });

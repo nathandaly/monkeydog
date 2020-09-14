@@ -6,6 +6,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Providers\RouteServiceProvider;
 use App\Resolvers\SocialUserResolver;
+use App\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -40,25 +42,26 @@ class BattleNetLoginController extends ApiController
         return Socialite::driver('battlenet')->stateless()->redirect();
     }
 
-    public function handleProviderCallback(Request $request)
+    public function handleProviderCallback(Request $request): JsonResponse
     {
-        //$user = Socialite::driver('battlenet')->userFromToken('EUKaldNPJE2A27Szf4TPubbZTvsoIO2OYO');
+        // Get last access token and attempt it.
         $user = Socialite::driver('battlenet')->stateless()->user();
 
-        $linkedSocialAccount = $this->socialUserResolver->resolveUserByProviderCredentials('battlenet', $user->token);
-
-        // $user->token;
+        $linkedSocialAccount = $this->socialUserResolver
+            ->resolveUserByProviderCredentials(
+                'battlenet', $user->token);
 
         if (!$linkedSocialAccount) {
             return $this->respondFailedLogin();
         }
 
-        Auth::login($linkedSocialAccount);
-        $userG = $this->guard()->user();
+        $token = $this->authToken($linkedSocialAccount);
 
         return $this->respondSuccess([
             'success' => true,
             'login_at' => new \DateTime(),
+
+            'token' => $token,
             'user' => $this->guard()->user(),
         ]);
     }
@@ -66,24 +69,22 @@ class BattleNetLoginController extends ApiController
     /**
      * Send the response after the user was authenticated.
      *
-     * @param Request $request
+     * @param Authenticatable $linkedSocialAccount
      * @return JsonResponse
      */
-    protected function sendLoginResponse(Request $request): JsonResponse
+    protected function authToken(Authenticatable $linkedSocialAccount): string
     {
-        $request->session()->regenerate();
-
-        $this->clearLoginAttempts($request);
-
-        if ($response = $this->authenticated($request, $this->guard()->user())) {
-            return $response;
-        }
-
-        return response()->json([
-            'success' => true,
-            'login_at' => new \DateTime(),
-            'user' => $this->guard()->user(),
-        ]);
+        Auth::login($linkedSocialAccount);
+        /** @var User $user */
+        $user = $this->guard()->user();
+        return $user->createToken(
+            'battlenet__' . $user->username,
+            [
+                'profile:view',
+                'profile:edit',
+                'profile:delete',
+            ]
+        )->plainTextToken;
     }
 
     /**
@@ -92,17 +93,12 @@ class BattleNetLoginController extends ApiController
      * @param Request $request
      * @return JsonResponse
      */
-    public function logout(Request $request): JsonResponse
+    public function revoke(Request $request): JsonResponse
     {
+        /** @var User $user */
+        $user = $this->guard()->user();
+        $token = $user->currentAccessToken()->delete();
         $this->guard()->logout();
-
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
-
-        if ($response = $this->loggedOut($request)) {
-            return $response;
-        }
 
         return response()->json([
             'success' => true,

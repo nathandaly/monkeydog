@@ -11,14 +11,18 @@ use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Laravel\Socialite\Facades\Socialite;
 
+/**
+ * Class SocialUserResolver
+ * @package App\Resolvers
+ */
 class SocialUserResolver implements SocialUserResolverInterface
 {
     /**
      * Resolve user by provider credentials.
      *
      * @param string $provider
-     * @param string $accessToken
      *
+     * @param string $accessToken
      * @return Authenticatable|null
      */
     public function resolveUserByProviderCredentials(string $provider, string $accessToken): ?Authenticatable
@@ -26,7 +30,11 @@ class SocialUserResolver implements SocialUserResolverInterface
         $providerUser = null;
 
         try {
-            $providerUser = Socialite::driver($provider)->userFromToken($accessToken);
+            if (empty($accessToken)) {
+                $providerUser = Socialite::driver('battlenet')->stateless()->user();
+            } else {
+                $providerUser = Socialite::driver($provider)->userFromToken($accessToken);
+            }
         } catch (Exception $exception) {}
 
         if ($providerUser) {
@@ -36,6 +44,10 @@ class SocialUserResolver implements SocialUserResolverInterface
         return null;
     }
 
+    /**
+     * @param string $provider
+     * @return SocialProviderContract|null
+     */
     public function delegateSocialResolver(string $provider): ?SocialProviderContract
     {
         $implementation = null;
@@ -44,6 +56,8 @@ class SocialUserResolver implements SocialUserResolverInterface
             case 'battlenet':
                 $implementation = new BattleNetAccountsService();
                 break;
+            case 'discord':
+                throw new \RuntimeException('Discord not yet implemented.');
             default:
                 throw new \RuntimeException('Unknown social authentication provider.');
         }
