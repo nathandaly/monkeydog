@@ -2,25 +2,27 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\Social;
 
+use App\Contracts\SocialProviderContract;
 use App\User;
 use App\LinkedSocialAccount;
 use Laravel\Socialite\Two\User as ProviderUser;
 
-class SocialAccountsService
+class BattleNetAccountsService implements SocialProviderContract
 {
+    public const PROVIDER = 'battlenet';
+
     /**
      * Find or create user instance by provider user instance and provider name.
      *
      * @param ProviderUser $providerUser
-     * @param string $provider
      *
      * @return User
      */
-    public function findOrCreate(ProviderUser $providerUser, string $provider): User
+    public function findOrCreate(ProviderUser $providerUser): User
     {
-        $linkedSocialAccount = LinkedSocialAccount::where('provider_name', $provider)
+        $linkedSocialAccount = LinkedSocialAccount::where('provider_name', self::PROVIDER)
             ->where('provider_id', $providerUser->getId())
             ->first();
 
@@ -30,21 +32,20 @@ class SocialAccountsService
 
         $user = null;
 
-        if ($email = $providerUser->getEmail()) {
-            $user = User::where('email', $email)->first();
+        if ($username = $providerUser->getNickname()) {
+            $user = User::where('username', $username)->first();
         }
 
         if (!$user) {
             $user = User::create([
-                'first_name' => $providerUser->getName(),
-                'last_name' => $providerUser->getName(),
-                'email' => $providerUser->getEmail(),
+                'name' => $providerUser->getName() ?? $providerUser->getNickname(),
+                'username' => $providerUser->getNickname(),
             ]);
         }
 
         $user->linkedSocialAccounts()->create([
             'provider_id' => $providerUser->getId(),
-            'provider_name' => $provider,
+            'provider_name' => self::PROVIDER,
         ]);
 
         return $user;

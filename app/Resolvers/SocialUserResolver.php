@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Resolvers;
 
-use App\Services\SocialAccountsService;
+use App\Contracts\SocialProviderContract;
+use App\Services\Social\BattleNetAccountsService;
 use Coderello\SocialGrant\Resolvers\SocialUserResolverInterface;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -29,8 +30,24 @@ class SocialUserResolver implements SocialUserResolverInterface
         } catch (Exception $exception) {}
 
         if ($providerUser) {
-            return (new SocialAccountsService())->findOrCreate($providerUser, $provider);
+            return ($this->delegateSocialResolver($provider))->findOrCreate($providerUser);
         }
+
         return null;
+    }
+
+    public function delegateSocialResolver(string $provider): ?SocialProviderContract
+    {
+        $implementation = null;
+
+        switch ($provider) {
+            case 'battlenet':
+                $implementation = new BattleNetAccountsService();
+                break;
+            default:
+                throw new \RuntimeException('Unknown social authentication provider.');
+        }
+
+        return $implementation;
     }
 }
