@@ -43,7 +43,7 @@ class SocialUserResolver implements SocialUserResolverInterface
     public function resolveUserProfileByProvider(string $provider, string $accessToken)
     {
         if ($providerUser = $this->resolveProviderUser($provider, $accessToken)) {
-            return ($this->delegateSocialResolver($provider))->getUserProfile($accessToken);
+            return ($this->delegateSocialResolver($provider))->getUserProfile($providerUser->token);
         }
 
         return null;

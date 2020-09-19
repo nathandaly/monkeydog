@@ -55,7 +55,7 @@ class BattleNetAccountsService implements SocialProviderContract
         return $user;
     }
 
-    public function getUserProfile(string $accessToken)
+    public function getUserProfile(string $token)
     {
         $response = (new Client())
             ->get(
@@ -63,7 +63,7 @@ class BattleNetAccountsService implements SocialProviderContract
                 [
                     'headers' => [
                         'Battlenet-Namespace' => 'profile-eu',
-                        'Authorization' => 'Bearer ' . 'EUnh3Eb7xB273UyWfIOiA7ejWwr45WH9Db', //'USDFA9y0FNlaV7TE4jTpYOwMONqKfglrjG',
+                        'Authorization' => 'Bearer ' . $token,
                     ],
                 ]
             );
