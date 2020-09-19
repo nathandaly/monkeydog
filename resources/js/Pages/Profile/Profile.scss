@@ -1,106 +1,12 @@
 .layout-wrapper {
-  height:100%;
+    min-height: 100%;
+    height: auto;
 }
 
-.NoMatch {
-  .cover {
-    position: relative;
-    min-height: 350px;
-    height: 100%;
-    background: url("../../../assets/images/lichking-web.jpg") no-repeat scroll center center / cover transparent;
+.Profile {
+    background-color: #17212f;
 
-    .cover-content {
-      left: 0;
-      line-height: 80px;
-      margin-top: -100px;
-      position: absolute;
-      text-align: center;
-      top: 40%;
-      width: 100%;
-
-      .p-card {
-        background-color: #17212f;
-        display: inline-block;
-        width: 800px;
-        padding: 20px;
-
-        .p-card-title {
-          font-size: 3.5rem;
-        }
-
-        .p-card-content {
-          padding: 0;
-        }
-
-        .p-card-footer {
-          padding: 0;
-
-          button {
-            padding: 10px 40px 10px 40px;
-            font-size: 24px;
-            text-transform: uppercase;
-            box-shadow: 0 4px 15px 0 #64B5F6;
-          }
-        }
-      }
+    .p-panel-title {
+        text-transform: uppercase;
     }
-
-    //.cover-title {
-    //  left: 0;
-    //  line-height: 80px;
-    //  margin-top: -100px;
-    //  position: absolute;
-    //  text-align: center;
-    //  top: 50%;
-    //  width: 100%;
-    //}
-
-    .vertical-center {
-      margin: 0;
-      position: relative;
-      -ms-transform: translateY(-50%);
-      transform: translateY(-50%);
-    }
-  }
-
-  @media screen and (max-width: 960px) {
-    .cover {
-      background: url("../../../assets/images/lichking-web.jpg") no-repeat scroll center center / cover transparent;
-    }
-  }
-
-  @media screen and (max-width: 640px) {
-    .cover {
-      .cover-content {
-        line-height: 60px;
-        top: 40%;
-
-        .p-card {
-          width: auto;
-          padding: 0;
-
-          .p-card-title {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            line-height: 40px;
-          }
-
-          .p-card-footer {
-            display: inline-flex;
-
-            button {
-              padding: 10px 20px 10px 20px;
-              font-size: inherit;
-              text-transform: uppercase;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  section.section-one {
-    padding: 50px 0;
-    background: #1f2d40;
-  }
 }

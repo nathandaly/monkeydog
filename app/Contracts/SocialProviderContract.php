@@ -10,4 +10,6 @@ use Laravel\Socialite\Two\User as ProviderUser;
 interface SocialProviderContract
 {
     public function findOrCreate(ProviderUser $providerUser): User;
+
+    public function getUserProfile(string $accessToken);
 }

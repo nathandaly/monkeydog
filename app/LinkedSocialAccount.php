@@ -13,8 +13,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class LinkedSocialAccount extends Model
 {
     protected $fillable = [
-        'provider_name',
         'provider_id',
+        'provider_name',
+        'token',
+        'scopes',
+        'created_at',
+        'updated_at',
+        'expires_at',
     ];
 
     public function user(): BelongsTo

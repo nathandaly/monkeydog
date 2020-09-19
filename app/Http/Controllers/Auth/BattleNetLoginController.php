@@ -40,7 +40,7 @@ class BattleNetLoginController extends Controller
 
     public function redirectToProvider()
     {
-        return Socialite::driver('battlenet')->stateless()->redirect();
+        return Socialite::driver('battlenet')->scopes(['wow.profile'])->stateless()->redirect();
     }
 
     public function handleProviderCallback(Request $request)
@@ -50,13 +50,15 @@ class BattleNetLoginController extends Controller
 
         $linkedSocialAccount = $this->socialUserResolver
             ->resolveUserByProviderCredentials(
-                'battlenet', $user->token);
+                'battlenet',
+                $user->token
+            );
 
         if (!$linkedSocialAccount) {
             throw new RuntimeException('No linked Battle.NET account found.');
         }
 
-        $token = $this->authToken($linkedSocialAccount);
+        $this->authToken($linkedSocialAccount);
 
         return redirect('/');
     }
@@ -92,7 +94,7 @@ class BattleNetLoginController extends Controller
     {
         /** @var User $user */
         $user = $this->guard()->user();
-        $token = $user->currentAccessToken()->delete();
+        $user->currentAccessToken()->delete();
         $this->guard()->logout();
 
         return response()->json([

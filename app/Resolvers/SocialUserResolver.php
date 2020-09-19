@@ -10,6 +10,7 @@ use Coderello\SocialGrant\Resolvers\SocialUserResolverInterface;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\User as ProviderUser;
 
 /**
  * Class SocialUserResolver
@@ -27,18 +28,22 @@ class SocialUserResolver implements SocialUserResolverInterface
      */
     public function resolveUserByProviderCredentials(string $provider, string $accessToken): ?Authenticatable
     {
-        $providerUser = null;
-
-        try {
-            if (empty($accessToken)) {
-                $providerUser = Socialite::driver('battlenet')->stateless()->user();
-            } else {
-                $providerUser = Socialite::driver($provider)->userFromToken($accessToken);
-            }
-        } catch (Exception $exception) {}
-
-        if ($providerUser) {
+        if ($providerUser = $this->resolveProviderUser($provider, $accessToken)) {
             return ($this->delegateSocialResolver($provider))->findOrCreate($providerUser);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $provider
+     * @param string $accessToken
+     * @return |null
+     */
+    public function resolveUserProfileByProvider(string $provider, string $accessToken)
+    {
+        if ($providerUser = $this->resolveProviderUser($provider, $accessToken)) {
+            return ($this->delegateSocialResolver($provider))->getUserProfile($accessToken);
         }
 
         return null;
@@ -48,7 +53,7 @@ class SocialUserResolver implements SocialUserResolverInterface
      * @param string $provider
      * @return SocialProviderContract|null
      */
-    public function delegateSocialResolver(string $provider): ?SocialProviderContract
+    private function delegateSocialResolver(string $provider): ?SocialProviderContract
     {
         $implementation = null;
 
@@ -63,5 +68,21 @@ class SocialUserResolver implements SocialUserResolverInterface
         }
 
         return $implementation;
+    }
+
+    /**
+     * @param string $provider
+     * @param string $accessToken
+     * @return ProviderUser|null
+     */
+    private function resolveProviderUser(string $provider, string $accessToken): ?ProviderUser
+    {
+        $providerUser = null;
+
+        try {
+            $providerUser = Socialite::driver($provider)->userFromToken($accessToken);
+        } catch (Exception $exception) {}
+
+        return $providerUser;
     }
 }

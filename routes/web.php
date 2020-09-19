@@ -31,3 +31,6 @@ Auth::routes();
 Route::get('/profile', 'ProfileController@index')
     ->middleware('auth')
     ->name('page.profile');
+
+Route::get('/discord', 'DiscordController@index')
+    ->name('page.discord');

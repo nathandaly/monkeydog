@@ -11,7 +11,7 @@ import './Navbar.scss';
 
 import { Menubar } from 'primereact/menubar';
 import { Button } from 'primereact/button';
-import {BreadCrumb} from "primereact/breadcrumb";
+import { BreadCrumb } from "primereact/breadcrumb";
 
 import logo from '../../../assets/images/logo-nav.png';
 
@@ -54,16 +54,19 @@ export class Navbar extends Component {
         return breadcrumbPath;
     };
 
-    handleClick = (event, category = null) => {
-        let location = '/'
+    handleClick = (event, category= null) => {
+        let location = '/';
+
+        if (event !== 'home') {
+            location = event.item.label.toLowerCase();
+        }
 
         if (category) {
             location = location.replace(/\s/g , '-');
             location = `${category}/${location}`;
         }
 
-        window.location.pathname = location;
-        this.updateBreadcrumbs();
+        Inertia.visit(location);
     };
 
     loginButtons = () => {

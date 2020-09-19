@@ -7,6 +7,7 @@ namespace App\Services\Social;
 use App\Contracts\SocialProviderContract;
 use App\User;
 use App\LinkedSocialAccount;
+use GuzzleHttp\Client;
 use Laravel\Socialite\Two\User as ProviderUser;
 
 class BattleNetAccountsService implements SocialProviderContract
@@ -46,8 +47,27 @@ class BattleNetAccountsService implements SocialProviderContract
         $user->linkedSocialAccounts()->create([
             'provider_id' => $providerUser->getId(),
             'provider_name' => self::PROVIDER,
+            'token' => $providerUser->token,
+            'scopes' => 'wow.profile',
+            //'expires_at' => '', // TODO: Is this needed with get user by access token?
         ]);
 
         return $user;
+    }
+
+    public function getUserProfile(string $accessToken)
+    {
+        $response = (new Client())
+            ->get(
+            'https://' . config('services.battlenet.region') . '.api.blizzard.com/profile/user/wow?locale=en_US',
+                [
+                    'headers' => [
+                        'Battlenet-Namespace' => 'profile-eu',
+                        'Authorization' => 'Bearer ' . 'EUnh3Eb7xB273UyWfIOiA7ejWwr45WH9Db', //'USDFA9y0FNlaV7TE4jTpYOwMONqKfglrjG',
+                    ],
+                ]
+            );
+
+        return json_decode((string) $response->getBody(), true);
     }
 }

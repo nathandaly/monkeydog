@@ -20,7 +20,10 @@ class CreateLinkedSocialAccountsTable extends Migration
             $table->unsignedBigInteger('user_id')
                 ->nullable()
                 ->index();
+            $table->string('token');
+            $table->text('scopes')->nullable();
             $table->timestamps();
+            $table->dateTime('expires_at')->nullable();
             $table->foreign('user_id')
                 ->references('id')
                 ->on('users')
