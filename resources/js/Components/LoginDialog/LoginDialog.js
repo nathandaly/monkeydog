@@ -43,11 +43,10 @@ class LoginDialog extends Component {
         this.setState({
             rememberMe: !this.state.rememberMe,
         });
-        console.log(this.props);
     }
 
     handleLogin = () => {
-        this.props.loginAction({}, hasError => console.log(hasError));
+        //this.props.loginAction({}, hasError => console.log(hasError));
     };
 
     switchToSignup = () => {

@@ -23,7 +23,7 @@ class Discord extends Component {
 
     fallbackCopyTextToClipboard = () => {
         const textArea = this.discordRef.current.element;
-        console.log(textArea);
+        console.info(textArea);
         textArea.focus();
         textArea.select();
 

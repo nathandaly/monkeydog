@@ -191,7 +191,6 @@ export class Navbar extends Component {
 }
 
 const mapStateToProps = state => {
-    console.log('mapStateToProps', state)
     return {
         navbar: state.navbar
     }
