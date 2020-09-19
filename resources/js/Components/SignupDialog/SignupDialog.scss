@@ -1,0 +1,115 @@
+.SignupDialog {
+  width: 40vw;
+
+  .or {
+    position: relative;
+    margin: 0 auto;
+    width: 360px;
+    height: 50px;
+
+    line-height: 50px;
+    text-align: center;
+  }
+
+  .or::before,
+  .or::after {
+    position: absolute;
+    width: 160px;
+    height: 1px;
+    top: 24px;
+    background-color: #aaa;
+    content: '';
+  }
+
+  .or::before {
+    left: 0;
+  }
+
+  .or::after {
+    right: 0;
+  }
+
+  .social-wrapper {
+    padding-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    .social-login {
+      .p-field {
+        cursor: pointer;
+        width: 64px;
+        height: 64px;
+      }
+      .facebook-icon {
+        background: url('../../../assets/images/facebook2.png');
+      }
+      .instagram-icon {
+        background: url('../../../assets/images/instagram2.png');
+      }
+      .gmail-icon {
+        background: url('../../../assets/images/gmail2.png');
+      }
+      .battlenet-icon {
+        background: url('../../../assets/images/BattleNet.png') no-repeat;
+      }
+    }
+  }
+
+  .p-dialog-header {
+    .p-dialog-title {
+      text-transform: uppercase;
+      font-size: 2.25rem;
+    }
+  }
+
+  .p-formgrid {
+    padding: 10px 0 10px 0;
+    .forgotten-password-link {
+      float: right;
+      width: auto;
+      padding: 0;
+    }
+  }
+
+  button {
+    font-weight: 600;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .SignupDialog {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+
+    .p-dialog-content {
+      margin-top: -1px;
+      height: 100%;
+      overflow-y: inherit;
+    }
+  }
+}
+
+@media screen and (max-width: 740px) {
+  .SignupDialog {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+
+    .p-dialog-content {
+      margin-top: -1px;
+      height: 100%;
+      overflow-y: inherit;
+    }
+  }
+}
+
+@media screen and (max-width: 960px) {
+    .p-dialog-content {
+      overflow-y: inherit;
+    }
+}

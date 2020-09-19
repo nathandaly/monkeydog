@@ -1,0 +1,33 @@
+$linkColor: #2196f3;
+$focusBorderColor:#BBDEFB;
+
+#root {
+  //text-align: center;
+  overflow: hidden;
+}
+
+.App {
+  height: 100%;
+
+  form {
+    .p-inputtext.p-invalid:enabled:focus {
+      border-color: #ef9a9a;
+      -webkit-box-shadow: 0 0 0 1px #ef9a9a;
+    }
+    .p-inputtext.p-invalid:enabled:hover {
+      border-color: #ef9a9a;
+      -webkit-box-shadow: 0 0 0 1px #ef9a9a;
+    }
+  }
+
+  form.ant-form {
+    div.ant-form-item-has-error {
+      .ant-input {
+        border-color: #ef9a9a;
+      }
+      div.ant-form-item-explain {
+        color: #ef9a9a;
+      }
+    }
+  }
+}

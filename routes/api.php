@@ -14,13 +14,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
-/**
- * Battle.NET authentication.
- */
-Route::get('login/battlenet', 'Api\BattleNetLoginController@redirectToProvider');
-Route::get('login/battlenet/callback', 'Api\BattleNetLoginController@handleProviderCallback');
-
 Route::middleware('auth:sanctum')->group(static function () {
     Route::post('logout/battlenet', 'Api\BattleNetLoginController@logout');
 

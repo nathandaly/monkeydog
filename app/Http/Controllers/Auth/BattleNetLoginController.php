@@ -1,16 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
+use App\Resolvers\SocialUserResolver;
+use App\User;
+use http\Exception\RuntimeException;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+
+use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 
 class BattleNetLoginController extends Controller
 {
+    private SocialUserResolver $socialUserResolver;
+
+    public function __construct(SocialUserResolver $socialUserResolver)
+    {
+        $this->socialUserResolver = $socialUserResolver;
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Login Controller
@@ -24,23 +38,6 @@ class BattleNetLoginController extends Controller
 
     use AuthenticatesUsers;
 
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = RouteServiceProvider::HOME;
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('guest')->except('logout');
-    }
-
     public function redirectToProvider()
     {
         return Socialite::driver('battlenet')->stateless()->redirect();
@@ -48,49 +45,41 @@ class BattleNetLoginController extends Controller
 
     public function handleProviderCallback(Request $request)
     {
+        // Get last access token and attempt it.
         $user = Socialite::driver('battlenet')->stateless()->user();
 
-        // $user->token;
+        $linkedSocialAccount = $this->socialUserResolver
+            ->resolveUserByProviderCredentials(
+                'battlenet', $user->token);
 
-        $request->session()->regenerate();
-
-        $this->clearLoginAttempts($request);
-
-        $this->guard()->login();
-        dd($this->guard()->user());
-
-        if ($response = $this->authenticated($request, $this->guard()->user())) {
-            return $response;
+        if (!$linkedSocialAccount) {
+            throw new RuntimeException('No linked Battle.NET account found.');
         }
 
-        return response()->json([
-            'success' => true,
-            'login_at' => new \DateTime(),
-            'user' => $this->guard()->user(),
-        ]);
+        $token = $this->authToken($linkedSocialAccount);
+
+        return redirect('/');
     }
 
     /**
      * Send the response after the user was authenticated.
      *
-     * @param Request $request
+     * @param Authenticatable $linkedSocialAccount
      * @return JsonResponse
      */
-    protected function sendLoginResponse(Request $request): JsonResponse
+    protected function authToken(Authenticatable $linkedSocialAccount): string
     {
-        $request->session()->regenerate();
-
-        $this->clearLoginAttempts($request);
-
-        if ($response = $this->authenticated($request, $this->guard()->user())) {
-            return $response;
-        }
-
-        return response()->json([
-            'success' => true,
-            'login_at' => new \DateTime(),
-            'user' => $this->guard()->user(),
-        ]);
+        Auth::login($linkedSocialAccount);
+        /** @var User $user */
+        $user = $this->guard()->user();
+        return $user->createToken(
+            'battlenet__' . $user->username,
+            [
+                'profile:view',
+                'profile:edit',
+                'profile:delete',
+            ]
+        )->plainTextToken;
     }
 
     /**
@@ -99,17 +88,12 @@ class BattleNetLoginController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function logout(Request $request): JsonResponse
+    public function revoke(Request $request): JsonResponse
     {
+        /** @var User $user */
+        $user = $this->guard()->user();
+        $token = $user->currentAccessToken()->delete();
         $this->guard()->logout();
-
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
-
-        if ($response = $this->loggedOut($request)) {
-            return $response;
-        }
 
         return response()->json([
             'success' => true,
