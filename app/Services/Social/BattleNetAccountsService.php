@@ -70,7 +70,7 @@ class BattleNetAccountsService implements SocialProviderContract
                         'Battlenet-Namespace' => 'profile-eu',
                         'Authorization' => 'Bearer ' . $token,
                     ],
-                    'timout' => 3.14,
+                    'timeout' => 3.14,
                 ]
             );
 
