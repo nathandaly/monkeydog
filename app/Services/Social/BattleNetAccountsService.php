@@ -8,11 +8,22 @@ use App\Contracts\SocialProviderContract;
 use App\User;
 use App\LinkedSocialAccount;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use JsonException;
 use Laravel\Socialite\Two\User as ProviderUser;
 
 class BattleNetAccountsService implements SocialProviderContract
 {
     public const PROVIDER = 'battlenet';
+
+    private Client $httpClient;
+
+    public function __construct()
+    {
+        $this->httpClient = new Client([
+           'timeout' => 2.14,
+        ]);
+    }
 
     /**
      * Find or create user instance by provider user instance and provider name.
@@ -57,14 +68,14 @@ class BattleNetAccountsService implements SocialProviderContract
 
     /**
      * @param string $token
-     * @return mixed
-     * @throws \JsonException
+     * @return mixed|null
+     * @throws JsonException
      */
     public function getUserProfile(string $token)
     {
-        $response = (new Client())
-            ->get(
-            'https://' . config('services.battlenet.region') . '.api.blizzard.com/profile/user/wow?locale=en_US',
+        try {
+            $response = $this->httpClient->request(
+                'GET', 'https://' . config('services.battlenet.region') . '.api.blizzard.com/profile/user/wow?locale=en_US',
                 [
                     'headers' => [
                         'Battlenet-Namespace' => 'profile-eu',
@@ -74,7 +85,12 @@ class BattleNetAccountsService implements SocialProviderContract
                 ]
             );
 
-        $result = $response->getBody()->getContents();
+            $result = $response->getBody()->getContents();
+        } catch (\Exception $e) {
+            throw new \RuntimeException($e->getMessage());
+        } catch (GuzzleException $e) {
+            throw new \RuntimeException($e->getMessage());
+        }
 
         return json_decode($result, true, 512, JSON_THROW_ON_ERROR);
     }
