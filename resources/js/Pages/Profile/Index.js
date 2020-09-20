@@ -21,6 +21,24 @@ class Index extends Component {
        this.props.updateBreadcrumbs(props.breadcrumbPath);
     }
 
+    specBodyTemplate = rowData => {
+        console.log(rowData)
+        const factionName = rowData.faction.name;
+        return <span className={`text-${factionName.toLowerCase()}`}></span>;
+    }
+
+    nameBodyTemplate = rowData => {
+        const className = rowData.playable_class.name.replace(/\s/g , "-");
+        return <span className={`class-color--${className.toLowerCase()}`}>{rowData.name}</span>;
+    }
+
+    factionBodyTemplate = rowData => {
+        console.log(rowData)
+        const factionName = rowData.faction.name;
+        return <span className={`text-${factionName.toLowerCase()}`}>{factionName}</span>;
+    }
+
+
     render() {
         const { user } = this.props.auth;
         const { characters } = this.props;
@@ -41,11 +59,11 @@ class Index extends Component {
                                 characters.map(character => (
                                     <AccordionTab key={character.realm} header={character.realm}>
                                         <DataTable value={character.characters}>
-                                            <Column field="name" header="Name"/>
+                                            {/*<Column body={this.specBodyTemplate}/>*/}
+                                            <Column header="Name" body={this.nameBodyTemplate}/>
                                             <Column field="level" header="Level"/>
-                                            <Column field="playable_class.name" header="Class"/>
                                             <Column field="playable_race.name" header="Race"/>
-                                            <Column field="faction.name" header="Faction"/>
+                                            <Column header="Faction" body={this.factionBodyTemplate}/>
                                         </DataTable>
                                     </AccordionTab>
                                 ))

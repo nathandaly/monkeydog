@@ -1,3 +1,70 @@
+@use "utils/variables";
+.class-color--death-knight {
+  color: #c41f3b !important;
+}
+
+.class-color--demon-hunter {
+  color: #a330c9 !important;
+}
+
+.class-color--druid {
+  color: #ff7d0a !important;
+}
+
+.class-color--hunter {
+  color: #abd473 !important;
+}
+
+.class-color--mage {
+  color: #69ccf0 !important;
+}
+
+.class-color--monk {
+  color: #00ff96 !important;
+}
+
+.class-color--paladin {
+  color: #f58cba !important;
+}
+
+.class-color--priest {
+  color: #fff !important;
+}
+
+.class-color--rogue {
+  color: #fff569 !important;
+}
+
+.class-color--shaman {
+  color: #0070de !important;
+}
+
+.class-color--warlock {
+  color: #9482c9 !important;
+}
+
+.class-color--warrior {
+  color: #c79c6e !important;
+}
+
+.text-horde {
+  color: #e02929 !important;
+}
+
+a.text-horde:focus,
+a.text-horde:hover {
+  color: #bb1b1b !important;
+}
+
+.text-alliance {
+  color: #69f !important;
+}
+
+a.text-alliance:focus,
+a.text-alliance:hover {
+  color: #37f !important;
+}
+
 html,
 body,
 #app {
