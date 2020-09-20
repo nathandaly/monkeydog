@@ -55,6 +55,11 @@ class BattleNetAccountsService implements SocialProviderContract
         return $user;
     }
 
+    /**
+     * @param string $token
+     * @return mixed
+     * @throws \JsonException
+     */
     public function getUserProfile(string $token)
     {
         $response = (new Client())
@@ -65,9 +70,12 @@ class BattleNetAccountsService implements SocialProviderContract
                         'Battlenet-Namespace' => 'profile-eu',
                         'Authorization' => 'Bearer ' . $token,
                     ],
+                    'timout' => 3.14,
                 ]
             );
 
-        return json_decode((string) $response->getBody(), true);
+        $result = $response->getBody()->getContents();
+
+        return json_decode($result, true, 512, JSON_THROW_ON_ERROR);
     }
 }
